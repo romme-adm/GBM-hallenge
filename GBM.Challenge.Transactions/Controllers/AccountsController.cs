@@ -4,6 +4,7 @@
     using GBM.Challenge.Transactions.Application.Investment.Queries.GetCurrentBalance;
     using GBM.Challenge.Transactions.Domain.BusinessExceptionCommon;
     using GBM.Challenge.Transactions.Domain.Buy.Exception;
+    using GBM.Challenge.Transactions.Domain.Sell;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
 
@@ -64,7 +65,6 @@
             }
             catch (InsufficientBalanceException ex)
             {
-                var balance = _getCurrentBalance.GetByGroup(id);
                 Errors = new string[] { ex.Message };
                 return StatusCode(StatusCodes.Status500InternalServerError, new
                 {
@@ -75,6 +75,18 @@
                 });
             }
             catch (DuplicateOperationException ex)
+            {
+                Errors = new string[] { ex.Message };
+
+                return StatusCode(StatusCodes.Status500InternalServerError, new
+                {
+                    Data = ErrorResponse(id),
+                    Errors = Errors,
+                    Code = StatusCodes.Status500InternalServerError,
+                    ReqId = ReqId
+                });
+            }
+            catch (InsufficientStockException ex) 
             {
                 Errors = new string[] { ex.Message };
 

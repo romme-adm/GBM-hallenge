@@ -16,7 +16,7 @@
         public string Operation { get; set; }
 
         /// <summary>
-        /// Gets or sets the IssuerName.
+        /// Gets or sets the Issuer_Name.
         /// </summary>
         public string Issuer_Name { get; set; }
 
@@ -29,5 +29,10 @@
         /// Gets or sets the Share__Price.
         /// </summary>
         public int Share__Price { get; set; }
+
+        /// <summary>
+        /// Gets or sets the Set_Id.
+        /// </summary>
+        public string Set_Id { get; set; }
     }
 }

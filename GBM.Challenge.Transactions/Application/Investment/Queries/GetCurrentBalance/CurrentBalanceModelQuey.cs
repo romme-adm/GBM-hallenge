@@ -37,5 +37,7 @@
         /// Gets or sets the share_price.
         /// </summary>
         public int share_price { get; set; }
+
+        public string set_id { get; set; }
     }
 }

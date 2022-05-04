@@ -40,7 +40,8 @@
                 {
                     issuer_name = ig.First().IssuerName,
                     share_price = ig.First().SharePrice,
-                    total_shares = ig.Count()
+                    total_shares = ig.Count(),
+                    set_id =  ig.First().OperationSeed
                 }).ToList(),
             };
         }
