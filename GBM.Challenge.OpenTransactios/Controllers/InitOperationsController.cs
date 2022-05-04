@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace GBM.Challenge.OpenTransactios.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("/gbm/challenge/v1/accounts/prepare")]
     [ApiController]
     public class InitOperationsController : ControllerBase
     {

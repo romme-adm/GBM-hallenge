@@ -9,7 +9,7 @@
     /// <summary>
     /// Defines the <see cref="CreateInvesmentController" />.
     /// </summary>
-    [Route("api/[controller]")]
+    [Route("gbm/challenge/v1/accounts")]
     [ApiController]
     public class CreateInvesmentController : ControllerBase
     {

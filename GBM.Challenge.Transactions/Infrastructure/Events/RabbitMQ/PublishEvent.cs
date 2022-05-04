@@ -43,7 +43,7 @@ namespace GBM.Challenge.Transactions.Infrastructure.Events.RabbitMQ
                 string message = JsonConvert.SerializeObject(@event);
                 var body = Encoding.UTF8.GetBytes(message);
                 channel.BasicPublish(broker,
-                 "transations.init",
+                 "transations.update",
                  null,
                  body);
             }

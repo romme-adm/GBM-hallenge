@@ -7,11 +7,13 @@
     using GBM.Challenge.Transactions.Domain.Sell;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
+    using Microsoft.Extensions.Logging;
+    using System;
 
     /// <summary>
     /// Defines the <see cref="AcountsController" />.
     /// </summary>
-    [Route("gbm/challenge/v1/acounts")]
+    [Route("gbm/challenge/v1/accounts")]
     [ApiController]
     public class AccountsController : ControllerBase
     {
@@ -25,15 +27,17 @@
         /// </summary>
         private readonly IGetCurrentBalance _getCurrentBalance;
 
+        private ILogger<AccountsController> _logger;
         /// <summary>
         /// Initializes a new instance of the <see cref="AccountsController"/> class.
         /// </summary>
         /// <param name="doTransactionCmd">The doTransactionCmd<see cref="IDoTransactionCmd"/>.</param>
         /// <param name="getCurrentBalance">The getCurrentBalance<see cref="IGetCurrentBalance"/>.</param>
-        public AccountsController(IDoTransactionCmd doTransactionCmd, IGetCurrentBalance getCurrentBalance)
+        public AccountsController(IDoTransactionCmd doTransactionCmd, IGetCurrentBalance getCurrentBalance, ILogger<AccountsController> logger)
         {
             _doTransactionCmd = doTransactionCmd;
             _getCurrentBalance = getCurrentBalance;
+            _logger = logger;
         }
 
         /// <summary>
@@ -51,11 +55,23 @@
         public ActionResult<ResponseModel<CurrentBalanceModel>> Post([FromRoute] int id, [FromBody] OrderModelCmd OrderModel)
         {
             string ReqId = this.HttpContext.TraceIdentifier;
+            _logger.LogInformation($"INIT REQUEST {ReqId}");
             string[] Errors;
             try
             {
-
+                var balance = _getCurrentBalance.GetByAccount(id);
+                if (balance is null)
+                {
+                    Errors = new string[] { "AccountNotFound" };
+                    return StatusCode(StatusCodes.Status404NotFound, new
+                    {
+                        Errors = Errors,
+                        Code = StatusCodes.Status404NotFound,
+                        ReqId = ReqId
+                    });
+                }
                 CurrentBalanceModel model = _doTransactionCmd.Execute(id, OrderModel);
+                _logger.LogInformation($"RETURNING REQUEST {ReqId}");
                 return StatusCode(StatusCodes.Status201Created, new ResponseModel<CurrentBalanceModel>()
                 {
                     Data = model,
@@ -66,6 +82,7 @@
             catch (InsufficientBalanceException ex)
             {
                 Errors = new string[] { ex.Message };
+                _logger.LogError($"RETURNING REQUEST ERROR {ReqId} { ex.Message}");
                 return StatusCode(StatusCodes.Status500InternalServerError, new
                 {
                     Data = ErrorResponse(id),
@@ -77,7 +94,7 @@
             catch (DuplicateOperationException ex)
             {
                 Errors = new string[] { ex.Message };
-
+                _logger.LogError($"RETURNING REQUEST ERROR {ReqId} { ex.Message}");
                 return StatusCode(StatusCodes.Status500InternalServerError, new
                 {
                     Data = ErrorResponse(id),
@@ -86,13 +103,24 @@
                     ReqId = ReqId
                 });
             }
-            catch (InsufficientStockException ex) 
+            catch (InsufficientStockException ex)
             {
                 Errors = new string[] { ex.Message };
-
+                _logger.LogError($"RETURNING REQUEST ERROR {ReqId} { ex.Message}");
                 return StatusCode(StatusCodes.Status500InternalServerError, new
                 {
                     Data = ErrorResponse(id),
+                    Errors = Errors,
+                    Code = StatusCodes.Status500InternalServerError,
+                    ReqId = ReqId
+                });
+            }
+            catch (Exception ex) 
+            {
+                Errors = new string[] { "InternalError" };
+                _logger.LogError($"RETURNING REQUEST ERROR {ReqId} { ex.Message}");
+                return StatusCode(StatusCodes.Status500InternalServerError, new
+                {
                     Errors = Errors,
                     Code = StatusCodes.Status500InternalServerError,
                     ReqId = ReqId

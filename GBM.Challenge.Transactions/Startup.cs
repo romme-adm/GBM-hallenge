@@ -1,5 +1,6 @@
 namespace GBM.Challenge.Transactions
 {
+    using GBM.Challenge.Transactions.Application.Interfaces;
     using GBM.Challenge.Transactions.Application.Interfaces.Integrity;
     using GBM.Challenge.Transactions.Application.Interfaces.RegisterMovement;
     using GBM.Challenge.Transactions.Application.Interfaces.Repositories;
@@ -9,6 +10,7 @@ namespace GBM.Challenge.Transactions
     using GBM.Challenge.Transactions.Application.Investment.Commands.SendOrders.Sell;
     using GBM.Challenge.Transactions.Application.Investment.Queries.GetCurrentBalance;
     using GBM.Challenge.Transactions.Infrastructure.BackgroundTasks;
+    using GBM.Challenge.Transactions.Infrastructure.Events.RabbitMQ;
     using GBM.Challenge.Transactions.Infrastructure.Integrity;
     using GBM.Challenge.Transactions.Infrastructure.RegisterMovement;
     using GBM.Challenge.Transactions.Repositories.RedisPersister;
@@ -86,6 +88,8 @@ namespace GBM.Challenge.Transactions
             /*infra*/
             services.AddScoped<IGenerateIntegrity, GenerateIntegrity>();
             services.AddScoped<IRegisterOperation, RegisterOperation>();
+            /*rabitMQ*/
+            services.AddScoped<IPublishEvent, PublishEvent>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

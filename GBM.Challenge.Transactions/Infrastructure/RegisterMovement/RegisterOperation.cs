@@ -1,9 +1,11 @@
 ﻿namespace GBM.Challenge.Transactions.Infrastructure.RegisterMovement
 {
+    using GBM.Challenge.Transactions.Application.Interfaces;
     using GBM.Challenge.Transactions.Application.Interfaces.Integrity;
     using GBM.Challenge.Transactions.Application.Interfaces.RegisterMovement;
     using GBM.Challenge.Transactions.Application.Interfaces.Repositories;
     using GBM.Challenge.Transactions.Application.Investment.Commands.SendOrders;
+    using GBM.Challenge.Transactions.Application.Investment.Queries.GetCurrentBalance;
     using System;
 
     /// <summary>
@@ -21,15 +23,19 @@
         /// </summary>
         IGenerateIntegrity _generateIntegrity;
 
+        IGetCurrentBalance _getCurrentBalance;
+        IPublishEvent _publishEvent;
         /// <summary>
         /// Initializes a new instance of the <see cref="RegisterOperation"/> class.
         /// </summary>
         /// <param name="redisCacheRepository">The redisCacheRepository<see cref="IRedisCacheRepository"/>.</param>
         /// <param name="generateIntegrity">The generateIntegrity<see cref="IGenerateIntegrity"/>.</param>
-        public RegisterOperation(IRedisCacheRepository redisCacheRepository, IGenerateIntegrity generateIntegrity)
+        public RegisterOperation(IRedisCacheRepository redisCacheRepository, IGenerateIntegrity generateIntegrity, IPublishEvent publishEvent, IGetCurrentBalance getCurrentBalance)
         {
             _redisCacheRepository = redisCacheRepository;
             _generateIntegrity = generateIntegrity;
+            _publishEvent = publishEvent;
+            _getCurrentBalance = getCurrentBalance;
         }
 
         /// <summary>
@@ -65,6 +71,8 @@
             _redisCacheRepository.RelativeExpHrs = 0.0833333;
             string key = _generateIntegrity.Create(GenerateOperationId(accountID, OrderModel));
             _redisCacheRepository.Set(key, OrderModel);
+            var balance = _getCurrentBalance.GetByAccount(accountID);
+            _publishEvent.Publish(balance);
         }
     }
 }
