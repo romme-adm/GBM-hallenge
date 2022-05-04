@@ -8,6 +8,9 @@ namespace GBM.Challenge.Transactions.Application.Interfaces.RegisterMovement
 {
     public interface IRegisterOperation
     {
+        string GenerateOperationId(int accountID, OrderModelCmd OrderModel);
         void OnMovementApplied(int accountID,OrderModelCmd OrderModel);
+
+        bool GetDuplicateMovenment(string movenmentKey);
     }
 }

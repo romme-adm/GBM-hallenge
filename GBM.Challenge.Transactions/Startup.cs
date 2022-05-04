@@ -1,6 +1,7 @@
 namespace GBM.Challenge.Transactions
 {
     using GBM.Challenge.Transactions.Application.Interfaces.Integrity;
+    using GBM.Challenge.Transactions.Application.Interfaces.RegisterMovement;
     using GBM.Challenge.Transactions.Application.Interfaces.Repositories;
     using GBM.Challenge.Transactions.Application.Investment.Commands.PersistAccountInfo;
     using GBM.Challenge.Transactions.Application.Investment.Commands.SendOrders;
@@ -9,6 +10,7 @@ namespace GBM.Challenge.Transactions
     using GBM.Challenge.Transactions.Application.Investment.Queries.GetCurrentBalance;
     using GBM.Challenge.Transactions.Infrastructure.BackgroundTasks;
     using GBM.Challenge.Transactions.Infrastructure.Integrity;
+    using GBM.Challenge.Transactions.Infrastructure.RegisterMovement;
     using GBM.Challenge.Transactions.Repositories.RedisPersister;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
@@ -83,6 +85,7 @@ namespace GBM.Challenge.Transactions
             });
             /*infra*/
             services.AddScoped<IGenerateIntegrity, GenerateIntegrity>();
+            services.AddScoped<IRegisterOperation, RegisterOperation>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

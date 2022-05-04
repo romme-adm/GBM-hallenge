@@ -16,6 +16,8 @@ namespace GBM.Challenge.Transactions.Application.Investment.Commands.PersistAcco
         }
         public void Save(InvestmentEventInfo info)
         {
+            _redisCacheRepository.SlidingExpirationMinutes = 24;
+            _redisCacheRepository.RelativeExpHrs = 60;
             string key = $"account_{info.Id}";
             _redisCacheRepository.Set(key,info);
         }

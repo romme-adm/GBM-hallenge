@@ -12,8 +12,12 @@ namespace GBM.Challenge.Transactions.Repositories.RedisPersister
     public class RedisCacheRepository : IRedisCacheRepository
     {
         private readonly IDistributedCache _cache;
+        public double RelativeExpHrs { get; set; }
+        public int SlidingExpirationMinutes { get; set; }
         public RedisCacheRepository(IDistributedCache cache)
         {
+            RelativeExpHrs = 24;
+            SlidingExpirationMinutes = 60;
             _cache = cache;
         }
         public T Get<T>(string key)
@@ -31,8 +35,8 @@ namespace GBM.Challenge.Transactions.Repositories.RedisPersister
         {
             var timeOut = new DistributedCacheEntryOptions
             {
-                AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(24),
-                SlidingExpiration = TimeSpan.FromMinutes(60)
+                AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(RelativeExpHrs),
+                SlidingExpiration = TimeSpan.FromMinutes(SlidingExpirationMinutes)
             };
             _cache.SetString(key, JsonConvert.SerializeObject(value), timeOut);
             return value;
